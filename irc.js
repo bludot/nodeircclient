@@ -83,7 +83,7 @@ module.exports = (function(){
                          self.conn.destroy();
                          connections.connect(self.options);
                      }
-                 }, 8 * 1000);
+                 }, 120000);
              } catch(err) {
                  for(var i in self.listeners) {
                      self.removeListener(i, self.listeners[i]);
