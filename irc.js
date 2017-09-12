@@ -73,7 +73,7 @@ module.exports = (function(){
              console.log('timeout');
              try {
                  self.send("PING","1");
-                 setTimeout(function() {
+/*                 setTimeout(function() {
                      if(!self.gotPing) {
                          for(var i in self.listeners) {
                              self.removeListener(i, self.listeners[i]);
@@ -83,7 +83,7 @@ module.exports = (function(){
                          self.conn.destroy();
                          connections.connect(self.options);
                      }
-                 }, 120000);
+                 }, 10000); */
              } catch(err) {
                  for(var i in self.listeners) {
                      self.removeListener(i, self.listeners[i]);
@@ -94,7 +94,12 @@ module.exports = (function(){
          },
          'error': function(err) {
              console.log(err);
-             connection(self.options);
+//             connection(self.options);
+                 for(var i in self.listeners) {
+                     self.removeListener(i, self.listeners[i]);
+                 }
+                 self.conn.destroy();
+                 connections.connect(self.options);
          },
          'data': function(data) {
              if(registered == false) {
@@ -144,6 +149,7 @@ module.exports = (function(){
      };
      self.listeners = {
          'raw': function(msg) {
+                 self.gotPing = true;
              if((typeof msg.command).toLowerCase() != "function") {
                  return;
              }
@@ -165,6 +171,7 @@ module.exports = (function(){
                  self.gotPing = true;
              }
              if (msg.command() == "PING") {
+                 self.gotPing = true;
                  logger.log("verbose", "got ping: " + msg.trailing());
                  self.conn.write("PONG " + msg.trailing()+"\r\n");
              }
